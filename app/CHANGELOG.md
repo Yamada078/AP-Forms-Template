@@ -1,48 +1,58 @@
+**English** · [ภาษาไทย](CHANGELOG.th.md)
+
+# Changelog
+
+## English and Thai interface · 3 October 2026
+
+- Added a language selector to organization accounts, the Builder, Logic, Responses, question banks, question packs and respondent screens.
+- Remember the browser's language choice and preserve entered text while switching languages.
+- Added English guides and question templates with links to their Thai counterparts.
+- Added language selection to the integration demo while keeping its credential on the server.
+- Use the chosen language for new form defaults. Existing authored content and stored responses remain unchanged; no database migration is required.
+
 ## Organization preview
 
-- เพิ่มหน้าตั้งองค์กร บัญชีสมาชิก ลิงก์เชิญ และตั้งรหัสผ่านใหม่
-- แยกผู้ดูแล ผู้สร้างฟอร์ม และผู้ตอบ พร้อมยกเลิก session เมื่อปิดบัญชีหรือเปลี่ยนสิทธิ์
-- เพิ่มฟอร์มแบบสมาชิกและแบบเลือกสมาชิก พร้อมบันทึกบัญชีผู้ตอบที่ยืนยันแล้ว
-- เพิ่ม migration 0010 โดยเก็บข้อมูลเดิม และตัวอย่างแอปเชื่อม API
-- รุ่นนี้ยังไม่รองรับ SSO/OIDC และ API สำหรับส่งคำตอบฟอร์มที่จำกัดสมาชิก
+- Added organization setup, member accounts, invitation links and password reset links.
+- Added administrator, form editor and respondent roles. Disabling an account or changing its role revokes its sessions.
+- Added members-only and selected-member form access, recording the respondent's verified account.
+- Added migration 0010, preserving existing data, and a runnable application integration example.
+- SSO/OIDC and API submissions to members-only forms are not supported in this preview.
 
-# บันทึกการเปลี่ยนแปลง
+## Distribution for self-hosting · 3 October 2026
 
-## ตัวแจกสำหรับติดตั้งเอง · 3 ตุลาคม 2026
+- Added the MIT license and installation instructions for a new database.
+- Replaced instance-specific Worker and database configuration with values installers can customize.
+- Added database setup commands, a local setup-key generator, API examples and GitHub source checks.
+- Made the question bank import test select questions by content so export ordering does not affect its check for reused tags.
 
-- เพิ่มใบอนุญาต MIT และคู่มือเริ่มจากฐานข้อมูลใหม่
-- ใช้ค่าตัวอย่างสำหรับชื่อ Worker และฐานข้อมูล ให้ผู้ติดตั้งตั้งค่าระบบของตัวเอง
-- เพิ่มคำสั่งเตรียมตาราง รหัสทีม local ตัวอย่างเรียก API และการตรวจสอบใน GitHub
-- แก้การทดสอบนำเข้าคลังคำถามให้เลือกคำถามตามเนื้อหา เพื่อให้ตรวจการใช้แท็กเดิมได้แน่นอนแม้ลำดับส่งออกเปลี่ยน
+## Documentation update · 2 October 2026
 
-## การจัดเอกสาร · 2 ตุลาคม 2026
-
-- เพิ่มหน้าแนะนำโปรเจกต์และสารบัญคู่มือ
-- เปลี่ยนชื่อโฟลเดอร์ตัวแอปเป็น `app` และปรับลิงก์กับคู่มือการตั้งค่า Cloudflare
-- แยกคู่มือใช้งาน การเผยแพร่ API และการพัฒนา
-- รวมข้อมูล V2.6 ไว้ในประวัติรุ่น และปรับข้อมูลการเผยแพร่ให้ตรงกับซอร์สปัจจุบัน
-- ปรับคำอธิบายบนหน้าฟอร์มและชุดคำถามให้อ่านเข้าใจง่ายขึ้น
+- Added a project introduction and guide index.
+- Renamed the application folder to app and updated deployment links and Cloudflare instructions.
+- Separated the user, deployment, API and development guides.
+- Consolidated V2.6 notes and aligned deployment instructions with the current source.
+- Reworded descriptions on the form and question pack screens.
 
 ## V2.6
 
-รุ่นนี้เพิ่มการขึ้นบรรทัดใหม่ในคำอธิบาย การตรวจคำตอบข้อความ และบล็อกเพิ่มเติมใต้ตัวเลือก
+Added multiline descriptions, text response validation and blocks beneath choices.
 
-### คำอธิบายและคำตอบข้อความ
+### Descriptions and text responses
 
-- คำอธิบายฟอร์ม Section คำถาม ข้อความ และ Panel เก็บการขึ้นบรรทัดใหม่
-- คำอธิบายรวมของฟอร์มเปลี่ยนเป็นช่องข้อความหลายบรรทัด
-- ข้อความสั้นและข้อความยาวกำหนดค่าหรือข้อความที่ไม่รับได้ โดยตรวจอีกครั้งก่อนเปลี่ยนหน้า
-- Conditional Display ใช้กำหนดการแสดงหรือซ่อนบล็อก
+- Preserve line breaks in form, section, question, text and panel descriptions.
+- Use a multiline control for the overall form description.
+- Validate disallowed values or text in short and long answers before moving to the next page.
+- Use Conditional Display to show or hide blocks.
 
-### บล็อกใต้ตัวเลือก
+### Blocks beneath choices
 
-- เพิ่ม Question, Heading, Text, Image, Audio, Video, Panel, Divider และ Spacer ใต้ตัวเลือกได้
-- คำถามในบล็อกย่อยมีบล็อกใต้ตัวเลือกของตัวเองได้
-- คำถามย่อยร่วมในการตรวจคำถามที่ต้องตอบ เงื่อนไข เส้นทางหน้า สรุปคำตอบ และการล้างคำตอบที่ถูกซ่อน
-- ข้อมูล `option.children` เดิมยังอ่านและแก้ไขได้
+- Support Question, Heading, Text, Image, Audio, Video, Panel, Divider and Spacer blocks beneath choices.
+- Allow nested questions to contain their own blocks beneath choices.
+- Include nested questions in required-answer checks, conditions, routing, summaries and clearing answers from hidden branches.
+- Continue to read and edit existing option.children data.
 
-### รูปแบบข้อมูล
+### Data format
 
-Form JSON เปลี่ยนเป็นเวอร์ชัน 5 และปรับข้อมูลเก่าให้อ่านได้ระหว่างโหลด การเปลี่ยนแปลงใน V2.6 ไม่ต้องใช้ migration ของ D1 และคง `DB` กับ `COLLAB` เดิม
+Form JSON moved to version 5, with older forms adapted when loaded. V2.6 requires no D1 migration and retains the existing DB and COLLAB bindings.
 
-รายการนี้รวบรวมจากบันทึก V2.6 ที่อยู่ใน repository ไม่ใช่ประวัติครบทุกเวอร์ชันของ AP+forms คู่มือระบบปัจจุบันอยู่ใน [docs](docs/)
+These notes consolidate the V2.6 records in the repository; they are not a complete version history. Current guides are in [docs](docs/en/).

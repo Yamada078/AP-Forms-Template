@@ -1,3 +1,7 @@
+
+function __apText(value) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.text(value) : value; }
+function __apHtml(strings, ...values) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.html(strings, ...values) : strings.reduce((result, part, index) => result + part + (index < values.length ? String(values[index] ?? '') : ''), ''); }
+function __apLabels(value) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.labels(value) : value; }
 (() => {
   const originalFetch = window.fetch.bind(window);
   window.fetch = (input, options = {}) => {
@@ -12,7 +16,7 @@
     return originalFetch(input, options);
   };
   window.APAccount = {
-    async status() { const response = await fetch('/api/account/status'); if (!response.ok) throw new Error('กรุณาปรับฐานข้อมูลตามคู่มือติดตั้ง'); return response.json(); },
+    async status() { const response = await fetch('/api/account/status'); if (!response.ok) throw new Error(__apText('กรุณาปรับฐานข้อมูลตามคู่มือติดตั้ง')); return response.json(); },
     login(next = location.pathname + location.search) { location.href = '/account.html?next=' + encodeURIComponent(next); },
     async logout() {
       await fetch('/api/account/logout', { method: 'POST', body: '{}' });

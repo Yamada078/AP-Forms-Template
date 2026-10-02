@@ -1,127 +1,137 @@
+<p align="center"><strong>English</strong> · <a href="README.th.md">ภาษาไทย</a></p>
+
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="AP+forms — สร้างฟอร์มและเชื่อมแอปของคุณเอง" width="100%">
+  <img src="docs/assets/banner.svg" alt="AP+forms — Build forms and connect your own applications" width="100%">
 </p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-9f9aff?style=flat-square" alt="MIT License"></a>
-  <img src="https://img.shields.io/badge/Node.js-24%2B-72b58a?style=flat-square" alt="Node.js 24 ขึ้นไป">
-  <img src="https://img.shields.io/badge/Cloudflare-Workers%20%2B%20D1-f5a363?style=flat-square" alt="Cloudflare Workers และ D1">
-  <a href="https://github.com/Yamada078/AP-Forms-Template/actions/workflows/check.yml"><img src="https://github.com/Yamada078/AP-Forms-Template/actions/workflows/check.yml/badge.svg" alt="ผลตรวจสอบซอร์ส"></a>
+  <img src="https://img.shields.io/badge/Node.js-24%2B-72b58a?style=flat-square" alt="Node.js 24 or later">
+  <img src="https://img.shields.io/badge/Cloudflare-Workers%20%2B%20D1-f5a363?style=flat-square" alt="Cloudflare Workers and D1">
+  <img src="https://img.shields.io/badge/Interface-English%20%2F%20Thai-8cb4ff?style=flat-square" alt="English and Thai interface">
+  <a href="https://github.com/Yamada078/AP-Forms-Template/actions/workflows/check.yml"><img src="https://github.com/Yamada078/AP-Forms-Template/actions/workflows/check.yml/badge.svg" alt="Source checks"></a>
 </p>
 
 <p align="center">
-  <a href="app/docs/deployment.md"><strong>ติดตั้งระบบ</strong></a> ·
-  <a href="app/docs/user-guide.md">คู่มือใช้งาน</a> ·
-  <a href="app/docs/api-quickstart.md">เชื่อม API</a> ·
-  <a href="docs/project.md">ภาพรวมโครงงาน</a>
+  <a href="app/docs/en/deployment.md"><strong>Install</strong></a> ·
+  <a href="app/docs/en/user-guide.md">User guide</a> ·
+  <a href="app/docs/en/app-integration-walkthrough.md">Connect an app</a> ·
+  <a href="docs/en/project.md">Project overview</a>
 </p>
 
 # AP+forms
 
-ระบบฟอร์มโอเพนซอร์สที่องค์กรนำไปติดตั้งและปรับใช้เองได้ มีบัญชีสมาชิก สิทธิ์ผู้ตอบ คลังคำถาม ชุดคำถาม และ API สำหรับเชื่อมเว็บหรือแอปขององค์กร
+An open-source form workspace that organizations can install and adapt for themselves. Build forms, invite members, control who can respond, and connect your own websites or applications through an HTTP API.
 
-นำซอร์สไปติดตั้ง ตั้งองค์กร เชิญสมาชิก และเริ่มสร้างฟอร์มของคุณเองได้ ข้อมูลและการเชื่อมต่อของแต่ละระบบอยู่ในฐานข้อมูลที่เจ้าของระบบสร้าง
+Each installation uses its own database, accounts and integration keys. The source includes the application and installation guides, with an English and Thai interface.
 
-สร้างฟอร์ม → เผยแพร่เวอร์ชัน → รับคำตอบหรือเชื่อมแอป → ดูผลในระบบของคุณ
+Build a form → Publish a version → Collect responses or connect an app → Review results in your own system.
 
-## สิ่งที่ทำได้
+## Features
 
-| ส่วนของระบบ | ความสามารถ |
+| Area | What you can do |
 | --- | --- |
-| **องค์กรและสมาชิก** | ตั้งชื่อและโลโก้ เชิญสมาชิก แยกผู้ดูแล ผู้สร้างฟอร์ม และผู้ตอบ |
-| **สิทธิ์ผู้ตอบ** | เปิดทั่วไป เฉพาะสมาชิก หรือเฉพาะสมาชิกที่เลือก ตรวจสิทธิ์ที่เซิร์ฟเวอร์ |
-| **Form Builder** | จัดหน้าและบล็อกคำถาม เพิ่มคำชี้แจงและสื่อ พร้อมตรวจรูปแบบคำตอบ |
-| **Logic** | แสดงหรือซ่อนบล็อก เปลี่ยนเส้นทางหน้า และเพิ่มคำถามใต้ตัวเลือก |
-| **Publish** | แยกฉบับร่างกับฉบับเผยแพร่ ใช้ลิงก์ถาวร ตั้งเวลาเปิด–ปิด และเก็บเวอร์ชัน |
-| **Responses** | ดูรายการ สรุปคำตอบ และแยกตามเวอร์ชันหรือแหล่งที่มา |
-| **Question Studio** | จัดคลังและแท็ก รองรับคำถาม 7 รูปแบบ รวมถึงจับคู่ เรียงลำดับ และลากวาง |
-| **Question Packs** | เลือกคำถามหรือสุ่มตามเงื่อนไข แล้วเผยแพร่ชุดที่คงคำถามไว้ตามเวอร์ชัน |
-| **Integration API** | ให้แต่ละแอปอ่านฟอร์ม ส่งคำตอบ อ่านชุดคำถาม และตรวจคำตอบตามสิทธิ์ที่กำหนด |
+| **Organization accounts** | Set a name and logo, invite members, and assign administrator, form editor or respondent roles |
+| **Respondent access** | Open forms to anyone with a link, signed-in members, or selected members, with access checked by the server |
+| **Form Builder** | Arrange pages and question blocks, add instructions and media, and validate answers |
+| **Logic** | Show or hide blocks, route between pages, and add questions beneath individual options |
+| **Publishing** | Keep drafts separate from published versions, share permanent links, and schedule opening and closing times |
+| **Responses** | Browse individual responses and summaries, grouped by version or source application |
+| **Question Studio** | Organize banks and tags, with seven question types including matching, ordering and drag and drop |
+| **Question packs** | Combine selected questions and rule-based pools into fixed published versions |
+| **Integration API** | Let authorized applications read forms, submit responses, read question packs and grade answers |
+| **Interface languages** | Switch between English and Thai without translating or overwriting authored form content |
 
-## เริ่มทดลองบนเครื่อง
+## Try it locally
 
-ติดตั้ง Node.js 24 ขึ้นไป เลือก **Use this template** บน GitHub เพื่อสร้าง repository ของคุณ หรือดาวน์โหลดซอร์ส หากต้องการลองจากซอร์สต้นฉบับ:
+Install Node.js 24 or later. Choose **Use this template** on GitHub to create your own repository, or download the source. To try this repository directly:
 
-```powershell
+```sh
 git clone https://github.com/Yamada078/AP-Forms-Template.git
-cd AP-Forms-Template
-cd app
+cd AP-Forms-Template/app
 npm ci
 npm run key:local
 npm run db:setup:local
 npm run dev
 ```
 
-เปิด URL ที่ terminal แสดง ตั้งองค์กรและผู้ดูแลคนแรกโดยใช้รหัสจากไฟล์ `.dev.vars` ในช่องรหัสตั้งค่าระบบ จากนั้นใช้บัญชีส่วนตัวเข้าสู่ Builder ขั้นตอนสร้างตารางใช้กับฐานข้อมูล local ที่ยังว่างครั้งแรก
+Open the URL shown in your terminal. On a fresh database, the first screen asks you to set up an organization and create its first administrator. Use the `TEAM_KEY` in `.dev.vars` as the setup key, then choose your own username and password. There is no shared demo account in the distribution.
 
-เมื่อต้องการเปิดเว็บให้ผู้ตอบใช้งาน ทำตาม [คู่มือติดตั้งบน Cloudflare](app/docs/deployment.md) เพื่อสร้างฐานข้อมูลของคุณ ตั้ง Secrets และ deploy
+Run `db:setup:local` only for a new, empty local database. Once setup is complete, visitors see the sign-in screen. Updating the application with the same database preserves accounts, forms and responses.
 
-## เชื่อมต่อกับแอปของคุณ
+Use **Language / ภาษา** to choose English or Thai. The first visit follows your browser language; your choice is remembered in that browser. Form names, questions and answers stay in the language their authors used.
 
-สร้าง Application เลือก permissions และฟอร์มหรือชุดคำถามที่อนุญาต จากนั้นสร้างรหัสเชื่อมต่อสำหรับเซิร์ฟเวอร์ของแอป
+To make the website available to your team, follow the [Cloudflare deployment guide](app/docs/en/deployment.md). Local preview data is separate from the database you create on Cloudflare.
 
-- อ่านฟอร์ม: `GET /api/integrations/forms/{publicId}/schema`
-- ส่งคำตอบ: `POST /api/integrations/forms/{publicId}/responses`
-- อ่านชุดคำถาม: `GET /api/integrations/question-packs/{packId}`
-- ตรวจคำตอบชุดคำถาม: `POST /api/integrations/question-packs/{packId}/grade`
+## Connect your own application
 
-เริ่มจาก [ตัวอย่าง API](app/docs/api-quickstart.md) แล้วดู [สิทธิ์และเส้นทาง API](app/docs/integration.md) เพิ่มเติม
+Create an Application in the administration interface, enable the permissions it needs, select its allowed forms or question packs, and generate an integration key for your application's server.
 
-## เหมาะกับงานแบบไหน
+- Read a form: `GET /api/integrations/forms/{publicId}/schema`
+- Submit responses: `POST /api/integrations/forms/{publicId}/responses`
+- Read a question pack: `GET /api/integrations/question-packs/{packId}`
+- Grade pack answers: `POST /api/integrations/question-packs/{packId}/grade`
 
-- แบบฟอร์มหรือแบบสอบถามที่ต้องมีเงื่อนไขและเส้นทางหลายหน้า
-- โครงงานที่ต้องการคลังคำถามและชุดคำถามนำกลับมาใช้
-- เว็บหรือเกมที่ต้องอ่านคำถามและส่งคำตอบผ่าน API
-- ผู้พัฒนาที่ต้องการศึกษาหรือปรับระบบฟอร์มภายใต้ MIT License
+The [working integration example](app/docs/en/app-integration-walkthrough.md) includes a small server and a browser page for reading a form and submitting responses. Your application provides its own respondent interface and, where needed, its own member authentication. Keep integration keys on the server.
 
-## โครงสร้าง
+See the [quickstart](app/docs/en/api-quickstart.md) and [API reference](app/docs/en/integration.md) for request formats and permissions. Reading previously stored responses through the Integration API is not available in this release.
+
+## Repository layout
 
 ```text
 AP-Forms-Template/
-├── README.md
+├── README.md             English project page
+├── README.th.md          Thai project page
 ├── LICENSE
 ├── CONTRIBUTING.md
-├── docs/                 ภาพประกอบและภาพรวมโครงงาน
-├── examples/             ตัวอย่างสำหรับผู้เชื่อม API
+├── docs/                 Project overview and artwork
+├── examples/             Runnable integration examples
 └── app/
-    ├── src/              Worker และ API
-    ├── public/           หน้าเว็บและสื่อประกอบ
-    ├── database/         โครงสร้างฐานข้อมูลใหม่
-    ├── migrations/       การปรับโครงสร้างฐานข้อมูล
-    ├── scripts/          เครื่องมือสำหรับผู้ติดตั้งและผู้พัฒนา
-    ├── tests/            ชุดทดสอบ
-    └── wrangler.jsonc    ค่าตั้งค่าตัวอย่าง
+    ├── src/              Worker and APIs
+    ├── public/           Interface, language catalog and assets
+    ├── database/         Schema for a new database
+    ├── migrations/       Changes for existing databases
+    ├── scripts/          Installation and development tools
+    ├── tests/            Automated checks
+    └── wrangler.jsonc    Example deployment configuration
 ```
 
-## คู่มือเพิ่มเติม
+## Guides
 
-- [เป้าหมายและภาพรวมโครงงาน](docs/project.md)
-- [เริ่มใช้งานภายในองค์กร](app/docs/organization-guide.md)
-- [ตัวอย่างเชื่อมแอปครบขั้นตอน](app/docs/app-integration-walkthrough.md)
-- [การพัฒนาและตรวจสอบระบบ](app/docs/development.md)
-- [สื่อตกแต่งฟอร์ม](app/public/assets/README.md)
-- [รูปประกอบคำถาม](app/public/assets/question-media/README.md)
-- [บันทึกการเปลี่ยนแปลง](app/CHANGELOG.md)
+- [Installation and deployment](app/docs/en/deployment.md)
+- [Organization accounts and respondent access](app/docs/en/organization-guide.md)
+- [Using the application](app/docs/en/user-guide.md)
+- [Connect an application from start to finish](app/docs/en/app-integration-walkthrough.md)
+- [API reference](app/docs/en/integration.md)
+- [Development and testing](app/docs/en/development.md)
+- [Interface languages](app/docs/en/languages.md)
+- [Project overview](docs/en/project.md)
+- [Form media](app/public/assets/README.md) and [question images](app/public/assets/question-media/README.md)
+- [Contributing](CONTRIBUTING.md)
 
-## สถานะและขอบเขตปัจจุบัน
+## Current status
 
-รุ่นทดลองสำหรับติดตั้งและพัฒนาต่อ มีบัญชีภายในและสิทธิ์สามระดับ หนึ่งระบบใช้สำหรับหนึ่งองค์กร ผู้สร้างฟอร์มทำงานร่วมกัน ยังไม่มี SSO/OIDC, MFA, การแยกสิทธิ์รายแผนก หรือการส่งอีเมลอัตโนมัติ ฟอร์มที่จำกัดสมาชิกต้องตอบผ่านหน้าเว็บที่เข้าสู่ระบบ ส่วน API ของ Application ใช้กับฟอร์มที่เปิดทั่วไป
+**Preview release for testing and further development.** One installation serves one organization. Form editors share access to forms and question banks. Accounts are managed within AP+forms; SSO/OIDC, MFA, department-specific permissions, automatic invitation emails and a member administration audit log are not implemented yet.
 
-รองรับ Cloudflare Workers และ D1 การตรวจรหัสผ่านใช้ bcrypt จึงควรใช้ Workers Paid สำหรับระบบที่เปิดใช้งานจริงตามข้อจำกัด CPU ของ Cloudflare หน้าเว็บใช้ภาษาไทยเป็นหลัก และการเพิ่มไฟล์สื่อทำผ่านซอร์ส
+Members-only forms require sign-in through this website. Application keys can access public forms only and cannot stand in for a verified member account.
+
+The application currently runs on Cloudflare Workers and D1. Password checks use bcrypt; Workers Paid is recommended for a deployed organization because of the platform's CPU limits. Other hosting platforms need changes to the database and collaboration layers. Media files are deployed with the source.
 
 <details>
-<summary><strong>คำถามก่อนติดตั้ง</strong></summary>
+<summary><strong>Before you install</strong></summary>
 
-**ใช้ฐานข้อมูลของใคร?** แต่ละระบบสร้าง D1 ในบัญชีของตน แล้วเปลี่ยนค่าใน `app/wrangler.jsonc` ตามคู่มือติดตั้ง
+**Whose database does it use?** Yours. Create D1 in your Cloudflare account and enter its details in `app/wrangler.jsonc`.
 
-**มีฟอร์มหรือรหัสพร้อมใช้ไหม?** ซอร์สมีแม่แบบคำถามสำหรับทดลอง ผู้ติดตั้งตั้งองค์กร บัญชีสมาชิก ฟอร์ม และรหัสเชื่อมต่อเอง
+**Are there existing accounts or integration keys?** No. You create your organization, accounts, forms and keys. The source includes question templates for experimentation.
 
-**แก้หน้าตาและ API ได้ไหม?** ได้ โค้ดหน้าเว็บอยู่ใน `app/public` และ Worker อยู่ใน `app/src` ดูขั้นตอนใน [คู่มือพัฒนา](app/docs/development.md)
+**Can I change the interface or API?** Yes. The interface lives in `app/public`; the Worker lives in `app/src`. Start with the [development guide](app/docs/en/development.md).
 
-**ช่วยพัฒนาได้อย่างไร?** แจ้งปัญหาหรือเสนอ pull request โดยเริ่มจาก [แนวทางร่วมพัฒนา](CONTRIBUTING.md)
+**Does creating a form or an account require another deployment?** No. These actions save data through the running website. Deploy again when you change the application code.
+
+**How can I contribute?** Report an issue, improve a translation or open a pull request. See [Contributing](CONTRIBUTING.md).
 
 </details>
 
-## ใบอนุญาต
+## License
 
-เผยแพร่ภายใต้ [MIT License](LICENSE) สามารถใช้ ดัดแปลง และแจกต่อได้ โดยคงข้อความลิขสิทธิ์และใบอนุญาตไว้
+Released under the [MIT License](LICENSE). You may use, modify and redistribute the project while retaining its copyright and license notices.

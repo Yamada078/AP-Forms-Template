@@ -1,8 +1,10 @@
-# สื่อประกอบฟอร์ม
+**English** · [ภาษาไทย](README.th.md)
 
-เก็บรูป เสียง และไฟล์ตกแต่งที่ต้องเผยแพร่พร้อมหน้าเว็บไว้ในโฟลเดอร์นี้ เช่น `header.png`, `logo.svg` หรือ `click.mp3`
+# Form media
 
-เมื่อตั้งค่าใน Builder ใช้เส้นทางที่เริ่มจาก `/assets/`:
+Place images, audio and decorative files that should deploy with the website in this directory, for example `header.png`, `logo.svg` or `click.mp3`.
+
+In the Builder, use paths beginning with `/assets/`:
 
 ```text
 /assets/header.png
@@ -10,6 +12,6 @@
 /assets/click.mp3
 ```
 
-ไฟล์ในโฟลเดอร์นี้เป็นไฟล์สาธารณะและ deploy ไปพร้อมเว็บ การเพิ่มสื่อทำผ่านไฟล์ในโปรเจกต์ หน้า Builder ยังไม่มีระบบอัปโหลดไฟล์และไม่ได้ใช้ R2
+These files are public and deploy with the website. Add media through the source files; the Builder does not yet provide file uploads or R2 storage.
 
-รูปสำหรับ Question Studio จัดการแยกใน [question-media](question-media/README.md)
+Question Studio images are managed separately in [question-media](question-media/README.md).

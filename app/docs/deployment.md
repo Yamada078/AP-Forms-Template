@@ -1,3 +1,5 @@
+[English](en/deployment.md) · **ภาษาไทย**
+
 # ติดตั้ง AP+forms ของคุณเอง
 
 คู่มือนี้เริ่มจากซอร์สและฐานข้อมูลใหม่ ผู้ติดตั้งจะมีเว็บ ฟอร์ม คำตอบ และรหัสเชื่อมต่อของตัวเอง
@@ -70,6 +72,14 @@ npx wrangler secret put TEAM_KEY
 
 Durable Object `FormRoom` ประกาศไว้ใน `exports` ของไฟล์ตั้งค่า Wrangler จะจัดการ namespace สำหรับการทำงานร่วมกันระหว่าง deploy
 
+## หลังตั้งค่าองค์กรแล้ว
+
+เว็บใช้ลิงก์เดิม ผู้ดูแลเชิญสมาชิกให้ตั้งรหัสผ่านของตนเอง คนที่ยังไม่ได้เข้าสู่ระบบจะเห็นหน้า Login การสร้างบัญชี เปลี่ยนรหัส สร้างฟอร์ม และส่งคำตอบทำผ่านหน้าเว็บได้ โดยไม่ต้อง deploy ซ้ำ
+
+บัญชีและข้อมูลเก็บใน D1 การ build หรือ deploy โค้ดใหม่โดยใช้ฐานข้อมูลเดิมไม่ทำให้ต้องตั้งองค์กรใหม่ ฐานทดสอบในเครื่องกับฐาน Cloudflare แยกกัน และบัญชีตัวอย่างในเครื่องไม่ได้ติดไปกับซอร์สตัวแจก
+
+เลือกไทยหรืออังกฤษได้จากเมนู **Language / ภาษา** ดู [คู่มือภาษา](languages.md)
+
 ## ตรวจระบบหลังติดตั้ง
 
 1. ตั้งองค์กรที่ `/account.html` และเข้าสู่ระบบด้วยบัญชีผู้ดูแล
@@ -129,4 +139,4 @@ npx wrangler d1 execute DB --remote --file migrations/0010_organization_accounts
 - [การตั้งค่า Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
 - [Durable Object class exports](https://developers.cloudflare.com/durable-objects/reference/durable-objects-migrations/)
 
-[กลับหน้าโครงงาน](../../README.md)
+[กลับหน้าโครงงาน](../../README.th.md)

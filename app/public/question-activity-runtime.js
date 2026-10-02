@@ -1,3 +1,7 @@
+
+function __apText(value) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.text(value) : value; }
+function __apHtml(strings, ...values) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.html(strings, ...values) : strings.reduce((result, part, index) => result + part + (index < values.length ? String(values[index] ?? '') : ''), ''); }
+function __apLabels(value) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.labels(value) : value; }
 import { assignDragDropToken, assignMatchingPair, gradeQuestionResponse } from './question-authoring-core.js';
 
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[character]);
@@ -53,16 +57,16 @@ export function ensureQuestionActivityState(question, current) {
 
 export function answerKeyHtml(question) {
   const config = question.answerConfig || {};
-  if (question.type === 'SINGLE_CHOICE' || question.type === 'MULTIPLE_CHOICE') return (config.choices || []).filter(choice => (config.correctIds || []).includes(choice.id)).map(choice => esc(choice.text || '(ยังไม่มีข้อความ)')).join('<br>');
-  if (question.type === 'TRUE_FALSE') return config.correctAnswer === true ? 'จริง' : config.correctAnswer === false ? 'เท็จ' : 'ยังไม่ได้ตั้งเฉลย';
-  if (question.type === 'ORDERING') { const byId = new Map((config.items || []).map(item => [item.id, item.text])); return (config.correctOrder || []).map((id, index) => `${index + 1}. ${esc(byId.get(id) || 'รูปภาพ')}`).join('<br>'); }
-  if (question.type === 'MATCHING') return (config.pairs || []).map(pair => `${esc(pair.leftText || 'รูปภาพ')} ↔ ${esc(pair.rightText || 'รูปภาพ')}`).join('<br>');
-  if (question.type === 'DRAG_DROP') { const targets = new Map((config.targets || []).map(target => [target.id, target.label])); return (config.tokens || []).map(token => `${esc(token.text || 'รูปภาพ')} → ${token.targetId ? esc(targets.get(token.targetId) || 'พื้นที่วาง') : 'ไม่ต้องวาง (ตัวหลอก)'}`).join('<br>'); }
-  return (config.acceptedAnswers || []).filter(Boolean).map(esc).join('<br>') || 'ยังไม่ได้ตั้งคำตอบที่ยอมรับ';
+  if (question.type === 'SINGLE_CHOICE' || question.type === 'MULTIPLE_CHOICE') return (config.choices || []).filter(choice => (config.correctIds || []).includes(choice.id)).map(choice => esc(choice.text || __apText('(ยังไม่มีข้อความ)'))).join('<br>');
+  if (question.type === 'TRUE_FALSE') return config.correctAnswer === true ? __apText('จริง') : config.correctAnswer === false ? __apText('เท็จ') : __apText('ยังไม่ได้ตั้งเฉลย');
+  if (question.type === 'ORDERING') { const byId = new Map((config.items || []).map(item => [item.id, item.text])); return (config.correctOrder || []).map((id, index) => `${index + 1}. ${esc(byId.get(id) || __apText('รูปภาพ'))}`).join('<br>'); }
+  if (question.type === 'MATCHING') return (config.pairs || []).map(pair => `${esc(pair.leftText || __apText('รูปภาพ'))} ↔ ${esc(pair.rightText || __apText('รูปภาพ'))}`).join('<br>');
+  if (question.type === 'DRAG_DROP') { const targets = new Map((config.targets || []).map(target => [target.id, target.label])); return (config.tokens || []).map(token => `${esc(token.text || __apText('รูปภาพ'))} → ${token.targetId ? esc(targets.get(token.targetId) || __apText('พื้นที่วาง')) : __apText('ไม่ต้องวาง (ตัวหลอก)')}`).join('<br>'); }
+  return (config.acceptedAnswers || []).filter(Boolean).map(esc).join('<br>') || __apText('ยังไม่ได้ตั้งคำตอบที่ยอมรับ');
 }
 
 function activityContent(text, media) {
-  return `<span class="qb-test-activity-content">${mediaHtml(media)}<span>${esc(text || 'รายการรูปภาพ')}</span></span>`;
+  return `<span class="qb-test-activity-content">${mediaHtml(media)}<span>${esc(text || __apText('รายการรูปภาพ'))}</span></span>`;
 }
 
 function matchingEditor(config, activity) {
@@ -73,58 +77,58 @@ function matchingEditor(config, activity) {
   const activeLeftId = activity.selectedMatchLeftId;
   const leftCards = view.leftItems.map(item => {
     const right = rightById.get(response[item.pair.leftId]);
-    return `<button type="button" class="qb-match-item ${activeLeftId === item.pair.leftId ? 'active' : ''} ${right ? 'paired' : ''}" data-activity-match-left="${esc(item.pair.leftId)}" aria-pressed="${activeLeftId === item.pair.leftId}">${activityContent(item.text, item.media)}<small>${right ? `จับคู่กับ ${esc(right.text || 'รายการรูปภาพ')}` : 'เลือกเพื่อจับคู่'}</small></button>`;
+    return `<button type="button" class="qb-match-item ${activeLeftId === item.pair.leftId ? 'active' : ''} ${right ? 'paired' : ''}" data-activity-match-left="${esc(item.pair.leftId)}" aria-pressed="${activeLeftId === item.pair.leftId}">${activityContent(item.text, item.media)}<small>${right ? __apHtml`จับคู่กับ ${esc(right.text || __apText('รายการรูปภาพ'))}` : __apText('เลือกเพื่อจับคู่')}</small></button>`;
   }).join('');
   const rightCards = view.rightItems.map(item => {
     const left = leftById.get(leftForRight.get(item.id));
-    return `<button type="button" class="qb-match-item qb-match-right ${left ? 'paired' : ''}" data-activity-match-right="${esc(item.id)}" ${activeLeftId ? '' : 'aria-disabled="true"'}>${activityContent(item.text, item.media)}<small>${left ? `จับคู่กับ ${esc(left.leftText || 'รายการรูปภาพ')}` : activeLeftId ? 'เลือกเป็นคู่' : 'เลือกฝั่งซ้ายก่อน'}</small></button>`;
+    return `<button type="button" class="qb-match-item qb-match-right ${left ? 'paired' : ''}" data-activity-match-right="${esc(item.id)}" ${activeLeftId ? '' : 'aria-disabled="true"'}>${activityContent(item.text, item.media)}<small>${left ? __apHtml`จับคู่กับ ${esc(left.leftText || __apText('รายการรูปภาพ'))}` : activeLeftId ? __apText('เลือกเป็นคู่') : __apText('เลือกฝั่งซ้ายก่อน')}</small></button>`;
   }).join('');
   const pairRows = view.pairs.filter(pair => response[pair.leftId]).map(pair => {
     const right = rightById.get(response[pair.leftId]);
-    return `<div class="qb-match-pair-row"><span>${esc(pair.leftText || 'รายการรูปภาพ')}</span><b aria-hidden="true">↔</b><span>${esc(right?.text || 'รายการรูปภาพ')}</span><button type="button" data-activity-match-remove="${esc(pair.leftId)}" aria-label="ยกเลิกคู่ ${esc(pair.leftText || 'รายการรูปภาพ')}">×</button></div>`;
+    return __apHtml`<div class="qb-match-pair-row"><span>${esc(pair.leftText || __apText('รายการรูปภาพ'))}</span><b aria-hidden="true">↔</b><span>${esc(right?.text || __apText('รายการรูปภาพ'))}</span><button type="button" data-activity-match-remove="${esc(pair.leftId)}" aria-label="ยกเลิกคู่ ${esc(pair.leftText || __apText('รายการรูปภาพ'))}">×</button></div>`;
   }).join('');
-  return `<div class="qb-test-matching"><p class="qb-activity-instruction">เลือกหนึ่งรายการจากฝั่งซ้าย แล้วเลือกคู่จากฝั่งขวา บางรายการฝั่งขวาอาจเป็นตัวหลอก</p><div class="qb-match-columns"><section><h3>ฝั่งซ้าย</h3><div class="qb-match-list">${leftCards}</div></section><section><h3>ฝั่งขวา</h3><div class="qb-match-list">${rightCards}</div></section></div><div class="qb-match-summary"><strong>คู่ที่เลือก ${Object.keys(response).length} / ${view.pairs.length}</strong>${pairRows || '<span>ยังไม่ได้จับคู่</span>'}</div></div>`;
+  return __apHtml`<div class="qb-test-matching"><p class="qb-activity-instruction">เลือกหนึ่งรายการจากฝั่งซ้าย แล้วเลือกคู่จากฝั่งขวา บางรายการฝั่งขวาอาจเป็นตัวหลอก</p><div class="qb-match-columns"><section><h3>ฝั่งซ้าย</h3><div class="qb-match-list">${leftCards}</div></section><section><h3>ฝั่งขวา</h3><div class="qb-match-list">${rightCards}</div></section></div><div class="qb-match-summary"><strong>คู่ที่เลือก ${Object.keys(response).length} / ${view.pairs.length}</strong>${pairRows || __apText('<span>ยังไม่ได้จับคู่</span>')}</div></div>`;
 }
 
 function dragTokenHtml(token, response, targets, selectedTokenId) {
   const target = targets.find(item => item.id === response[token.id]);
-  return `<div class="qb-drag-token-card ${selectedTokenId === token.id ? 'selected' : ''}" data-activity-drag-token="${esc(token.id)}" role="button" tabindex="0" aria-pressed="${selectedTokenId === token.id}" aria-label="${esc(token.text || 'ชิ้นรูปภาพ')}${target ? ` อยู่ที่ ${esc(target.label || 'พื้นที่วาง')}` : ' ยังไม่ได้วาง'}">${activityContent(token.text, token.media)}<small>${target ? `อยู่ที่ ${esc(target.label || 'พื้นที่วาง')}` : 'ลากชิ้นนี้ไปยังพื้นที่วาง'}</small></div>`;
+  return `<div class="qb-drag-token-card ${selectedTokenId === token.id ? 'selected' : ''}" data-activity-drag-token="${esc(token.id)}" role="button" tabindex="0" aria-pressed="${selectedTokenId === token.id}" aria-label="${esc(token.text || __apText('ชิ้นรูปภาพ'))}${target ? __apHtml` อยู่ที่ ${esc(target.label || __apText('พื้นที่วาง'))}` : __apText(' ยังไม่ได้วาง')}">${activityContent(token.text, token.media)}<small>${target ? __apHtml`อยู่ที่ ${esc(target.label || __apText('พื้นที่วาง'))}` : __apText('ลากชิ้นนี้ไปยังพื้นที่วาง')}</small></div>`;
 }
 
 function dragDropEditor(config, activity) {
   const targets = config.targets || [], tokens = config.tokens || [], response = activity.response || {};
-  const tokenBank = tokens.filter(token => !response[token.id]).map(token => dragTokenHtml(token, response, targets, activity.selectedDragTokenId)).join('') || '<span class="qb-drop-empty">วางครบทุกชิ้นแล้ว</span>';
+  const tokenBank = tokens.filter(token => !response[token.id]).map(token => dragTokenHtml(token, response, targets, activity.selectedDragTokenId)).join('') || __apText('<span class="qb-drop-empty">วางครบทุกชิ้นแล้ว</span>');
   const targetCards = targets.map(target => {
     const placed = tokens.filter(token => response[token.id] === target.id);
-    return `<section class="qb-drop-target" data-activity-drop-target="${esc(target.id)}"><header>${activityContent(target.label, target.media)}</header><div class="qb-drop-zone">${placed.map(token => dragTokenHtml(token, response, targets, activity.selectedDragTokenId)).join('') || '<span class="qb-drop-empty">ลากชิ้นมาวางที่นี่</span>'}</div></section>`;
+    return `<section class="qb-drop-target" data-activity-drop-target="${esc(target.id)}"><header>${activityContent(target.label, target.media)}</header><div class="qb-drop-zone">${placed.map(token => dragTokenHtml(token, response, targets, activity.selectedDragTokenId)).join('') || __apText('<span class="qb-drop-empty">ลากชิ้นมาวางที่นี่</span>')}</div></section>`;
   }).join('');
-  return `<div class="qb-test-dragdrop"><p class="qb-activity-instruction">ลากชิ้นไปยังพื้นที่วาง หากชิ้นใดไม่เข้ากับพื้นที่ไหนให้คงไว้ด้านบน ชิ้นที่วางแล้วลากย้ายกลับได้</p><section class="qb-drag-bank" data-activity-drop-target=""><h3>ชิ้นที่จะลาก / ชิ้นที่ไม่ใช้</h3><div class="qb-drag-bank-items">${tokenBank}</div></section><div class="qb-drop-grid">${targetCards}</div><div class="qb-drag-status">วางในพื้นที่แล้ว ${Object.keys(response).length} ชิ้น</div></div>`;
+  return __apHtml`<div class="qb-test-dragdrop"><p class="qb-activity-instruction">ลากชิ้นไปยังพื้นที่วาง หากชิ้นใดไม่เข้ากับพื้นที่ไหนให้คงไว้ด้านบน ชิ้นที่วางแล้วลากย้ายกลับได้</p><section class="qb-drag-bank" data-activity-drop-target=""><h3>ชิ้นที่จะลาก / ชิ้นที่ไม่ใช้</h3><div class="qb-drag-bank-items">${tokenBank}</div></section><div class="qb-drop-grid">${targetCards}</div><div class="qb-drag-status">วางในพื้นที่แล้ว ${Object.keys(response).length} ชิ้น</div></div>`;
 }
 
 function answerEditor(question, activity) {
   const config = question.answerConfig || {};
   if (question.type === 'SINGLE_CHOICE' || question.type === 'MULTIPLE_CHOICE') {
     const control = question.type === 'SINGLE_CHOICE' ? 'radio' : 'checkbox';
-    return (config.choices || []).map(choice => { const checked = question.type === 'SINGLE_CHOICE' ? activity.response === choice.id : (activity.response || []).includes(choice.id); return `<label class="qb-test-choice"><input type="${control}" name="activityChoice" data-activity-choice="${esc(choice.id)}" ${checked ? 'checked' : ''}><span>${esc(choice.text || 'ตัวเลือกที่ยังไม่มีข้อความ')}</span></label>`; }).join('');
+    return (config.choices || []).map(choice => { const checked = question.type === 'SINGLE_CHOICE' ? activity.response === choice.id : (activity.response || []).includes(choice.id); return `<label class="qb-test-choice"><input type="${control}" name="activityChoice" data-activity-choice="${esc(choice.id)}" ${checked ? 'checked' : ''}><span>${esc(choice.text || __apText('ตัวเลือกที่ยังไม่มีข้อความ'))}</span></label>`; }).join('');
   }
-  if (question.type === 'TRUE_FALSE') return `<div class="qb-test-true"><label class="qb-test-choice"><input type="radio" name="activityTrue" value="true" ${activity.response === true ? 'checked' : ''}><span>จริง</span></label><label class="qb-test-choice"><input type="radio" name="activityTrue" value="false" ${activity.response === false ? 'checked' : ''}><span>เท็จ</span></label></div>`;
-  if (question.type === 'ORDERING') { const byId = new Map((config.items || []).map(item => [item.id, item])); return (activity.response || []).map((id, index) => { const item = byId.get(id) || {}; return `<div class="qb-test-choice"><span class="qb-answer-number">${index + 1}</span><span class="grow">${esc(item.text || 'รูปภาพ')}</span><button class="qb-btn sm" data-activity-order="${esc(id)}" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button class="qb-btn sm" data-activity-order="${esc(id)}" data-direction="1" ${index === (activity.response || []).length - 1 ? 'disabled' : ''}>↓</button></div>`; }).join(''); }
+  if (question.type === 'TRUE_FALSE') return __apHtml`<div class="qb-test-true"><label class="qb-test-choice"><input type="radio" name="activityTrue" value="true" ${activity.response === true ? 'checked' : ''}><span>จริง</span></label><label class="qb-test-choice"><input type="radio" name="activityTrue" value="false" ${activity.response === false ? 'checked' : ''}><span>เท็จ</span></label></div>`;
+  if (question.type === 'ORDERING') { const byId = new Map((config.items || []).map(item => [item.id, item])); return (activity.response || []).map((id, index) => { const item = byId.get(id) || {}; return `<div class="qb-test-choice"><span class="qb-answer-number">${index + 1}</span><span class="grow">${esc(item.text || __apText('รูปภาพ'))}</span><button class="qb-btn sm" data-activity-order="${esc(id)}" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button class="qb-btn sm" data-activity-order="${esc(id)}" data-direction="1" ${index === (activity.response || []).length - 1 ? 'disabled' : ''}>↓</button></div>`; }).join(''); }
   if (question.type === 'MATCHING') return matchingEditor(config, activity);
   if (question.type === 'DRAG_DROP') return dragDropEditor(config, activity);
-  return `<input class="qb-test-short" data-activity-short value="${esc(activity.response || '')}" placeholder="พิมพ์คำตอบของผู้เรียน…" autocomplete="off">`;
+  return __apHtml`<input class="qb-test-short" data-activity-short value="${esc(activity.response || '')}" placeholder="พิมพ์คำตอบของผู้เรียน…" autocomplete="off">`;
 }
 
 export function renderQuestionActivity(question, activity, options = {}) {
   const controls = { check: true, reset: true, revealAnswer: true, revealExplanation: true, ...(options.controls || {}) };
   const actions = [
-    controls.check ? '<button data-activity-check class="qb-btn primary">ตรวจคำตอบ</button>' : '',
-    controls.reset ? '<button data-activity-reset class="qb-btn">เริ่มใหม่</button>' : '',
-    controls.revealAnswer ? `<button data-activity-reveal-answer class="qb-btn">${activity.revealAnswer ? 'ซ่อนเฉลย' : 'แสดงเฉลย'}</button>` : '',
-    controls.revealExplanation && question.explanation ? `<button data-activity-reveal-explanation class="qb-btn">${activity.revealExplanation ? 'ซ่อนคำอธิบาย' : 'แสดงคำอธิบาย'}</button>` : '',
+    controls.check ? __apText('<button data-activity-check class="qb-btn primary">ตรวจคำตอบ</button>') : '',
+    controls.reset ? __apText('<button data-activity-reset class="qb-btn">เริ่มใหม่</button>') : '',
+    controls.revealAnswer ? `<button data-activity-reveal-answer class="qb-btn">${activity.revealAnswer ? __apText('ซ่อนเฉลย') : __apText('แสดงเฉลย')}</button>` : '',
+    controls.revealExplanation && question.explanation ? `<button data-activity-reveal-explanation class="qb-btn">${activity.revealExplanation ? __apText('ซ่อนคำอธิบาย') : __apText('แสดงคำอธิบาย')}</button>` : '',
   ].filter(Boolean).join('');
-  const result = activity.checked ? `<div class="qb-test-result ${activity.correct ? 'correct' : 'incorrect'}"><strong>${activity.correct ? '✓ ตอบถูก' : '✕ ยังไม่ถูก'}</strong><span>${activity.correct ? 'คำตอบนี้ตรงกับเฉลย' : 'ลองเปลี่ยนคำตอบแล้วตรวจอีกครั้งได้'}</span></div>` : '';
-  const kicker = options.kicker || 'ทดลองตอบ';
-  return `<div class="qb-paper-kicker">${esc(kicker)} · ${esc(options.typeLabel || question.type)}</div><h2 class="qb-test-prompt">${esc(question.prompt || 'คำถามที่ยังไม่มีโจทย์')}</h2>${question.description ? `<p class="qb-test-description">${esc(question.description)}</p>` : ''}${mediaHtml(question.media)}<div class="qb-test-answers">${answerEditor(question, activity)}</div>${result}${actions ? `<div class="qb-test-actions">${actions}</div>` : ''}${controls.revealAnswer && activity.revealAnswer ? `<div class="qb-reveal"><strong>เฉลย</strong><div>${answerKeyHtml(question)}</div></div>` : ''}${controls.revealExplanation && activity.revealExplanation && question.explanation ? `<div class="qb-reveal explanation"><strong>คำอธิบาย</strong><div>${esc(question.explanation)}</div></div>` : ''}${options.note ? `<div class="qb-test-note">${esc(options.note)}</div>` : ''}`;
+  const result = activity.checked ? `<div class="qb-test-result ${activity.correct ? 'correct' : 'incorrect'}"><strong>${activity.correct ? __apText('✓ ตอบถูก') : __apText('✕ ยังไม่ถูก')}</strong><span>${activity.correct ? __apText('คำตอบนี้ตรงกับเฉลย') : __apText('ลองเปลี่ยนคำตอบแล้วตรวจอีกครั้งได้')}</span></div>` : '';
+  const kicker = options.kicker || __apText('ทดลองตอบ');
+  return `<div class="qb-paper-kicker">${esc(kicker)} · ${esc(options.typeLabel || question.type)}</div><h2 class="qb-test-prompt">${esc(question.prompt || __apText('คำถามที่ยังไม่มีโจทย์'))}</h2>${question.description ? `<p class="qb-test-description">${esc(question.description)}</p>` : ''}${mediaHtml(question.media)}<div class="qb-test-answers">${answerEditor(question, activity)}</div>${result}${actions ? `<div class="qb-test-actions">${actions}</div>` : ''}${controls.revealAnswer && activity.revealAnswer ? __apHtml`<div class="qb-reveal"><strong>เฉลย</strong><div>${answerKeyHtml(question)}</div></div>` : ''}${controls.revealExplanation && activity.revealExplanation && question.explanation ? __apHtml`<div class="qb-reveal explanation"><strong>คำอธิบาย</strong><div>${esc(question.explanation)}</div></div>` : ''}${options.note ? `<div class="qb-test-note">${esc(options.note)}</div>` : ''}`;
 }
 
 export function bindQuestionActivity(root, question, activity, options = {}) {

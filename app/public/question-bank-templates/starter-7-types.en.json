@@ -1,0 +1,205 @@
+{
+  "kind": "goi.question-bank.package",
+  "schemaVersion": 1,
+  "bank": {
+    "name": "Seven question types: starter bank",
+    "description": "A small starter template for exploring Question Studio"
+  },
+  "tags": [
+    {
+      "key": "starter",
+      "name": "Example",
+      "group": "Source"
+    },
+    {
+      "key": "basic",
+      "name": "Basic",
+      "group": "Level"
+    }
+  ],
+  "questions": [
+    {
+      "id": "single_choice_example",
+      "type": "SINGLE_CHOICE",
+      "prompt": "Which number is even?",
+      "difficulty": 1,
+      "answerConfig": {
+        "choices": [
+          {
+            "id": "single_a",
+            "text": "3"
+          },
+          {
+            "id": "single_b",
+            "text": "4"
+          }
+        ],
+        "correctIds": [
+          "single_b"
+        ]
+      },
+      "tags": [
+        "starter",
+        "basic"
+      ],
+      "explanation": "4 is divisible by 2."
+    },
+    {
+      "id": "multiple_choice_example",
+      "type": "MULTIPLE_CHOICE",
+      "prompt": "Which are the primary colors of light?",
+      "difficulty": 2,
+      "answerConfig": {
+        "choices": [
+          {
+            "id": "multi_r",
+            "text": "Red"
+          },
+          {
+            "id": "multi_g",
+            "text": "Green"
+          },
+          {
+            "id": "multi_b",
+            "text": "Blue"
+          },
+          {
+            "id": "multi_y",
+            "text": "Yellow"
+          }
+        ],
+        "correctIds": [
+          "multi_r",
+          "multi_g",
+          "multi_b"
+        ]
+      },
+      "tags": [
+        "starter"
+      ]
+    },
+    {
+      "id": "true_false_example",
+      "type": "TRUE_FALSE",
+      "prompt": "Ice is water in its solid state.",
+      "difficulty": 1,
+      "answerConfig": {
+        "correctAnswer": true
+      },
+      "tags": [
+        "starter",
+        "basic"
+      ]
+    },
+    {
+      "id": "short_answer_example",
+      "type": "SHORT_ANSWER",
+      "prompt": "What is the capital of Thailand?",
+      "difficulty": 1,
+      "answerConfig": {
+        "acceptedAnswers": [
+          "Bangkok",
+          "Krung Thep",
+          "Krung Thep Maha Nakhon"
+        ],
+        "caseSensitive": false,
+        "trimWhitespace": true,
+        "normalizeUnicode": true
+      },
+      "tags": [
+        "starter",
+        "basic"
+      ]
+    },
+    {
+      "id": "ordering_example",
+      "type": "ORDERING",
+      "prompt": "Arrange the numbers from smallest to largest.",
+      "difficulty": 2,
+      "answerConfig": {
+        "items": [
+          {
+            "id": "order_1",
+            "text": "1"
+          },
+          {
+            "id": "order_2",
+            "text": "2"
+          },
+          {
+            "id": "order_3",
+            "text": "3"
+          }
+        ],
+        "correctOrder": [
+          "order_1",
+          "order_2",
+          "order_3"
+        ]
+      },
+      "tags": [
+        "starter"
+      ]
+    },
+    {
+      "id": "matching_example",
+      "type": "MATCHING",
+      "prompt": "Match each country with its capital.",
+      "difficulty": 2,
+      "answerConfig": {
+        "pairs": [
+          {
+            "id": "pair_1",
+            "leftId": "country_th",
+            "rightId": "capital_bkk",
+            "leftText": "Thailand",
+            "rightText": "Bangkok"
+          },
+          {
+            "id": "pair_2",
+            "leftId": "country_jp",
+            "rightId": "capital_tokyo",
+            "leftText": "Japan",
+            "rightText": "Tokyo"
+          }
+        ]
+      },
+      "tags": [
+        "starter"
+      ]
+    },
+    {
+      "id": "drag_drop_example",
+      "type": "DRAG_DROP",
+      "prompt": "Drag each animal into the correct group.",
+      "difficulty": 2,
+      "answerConfig": {
+        "targets": [
+          {
+            "id": "mammal",
+            "label": "Mammals"
+          },
+          {
+            "id": "bird",
+            "label": "Birds"
+          }
+        ],
+        "tokens": [
+          {
+            "id": "dog",
+            "text": "Dog",
+            "targetId": "mammal"
+          },
+          {
+            "id": "sparrow",
+            "text": "Sparrow",
+            "targetId": "bird"
+          }
+        ]
+      },
+      "tags": [
+        "starter"
+      ]
+    }
+  ]
+}

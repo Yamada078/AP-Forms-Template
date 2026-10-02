@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "templates": [
+    {
+      "name": "Seven question types",
+      "description": "A small starter bank for editing questions, using tags and building question packs.",
+      "path": "/question-bank-templates/starter-7-types.en.json"
+    }
+  ]
+}

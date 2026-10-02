@@ -1,23 +1,27 @@
-# ร่วมพัฒนา AP+forms
+**English** · [ภาษาไทย](CONTRIBUTING.th.md)
 
-การแจ้งปัญหา ปรับคู่มือ และเสนอการเปลี่ยนแปลงช่วยให้คนติดตั้งระบบได้ง่ายขึ้น
+# Contributing to AP+forms
 
-## แจ้งปัญหา
+Reports, documentation improvements and code changes help others install and use their own system.
 
-ระบุขั้นตอนที่ทำ สิ่งที่คาดหวัง และผลที่เกิดขึ้น พร้อม browser หรือเวอร์ชัน Node.js ที่ใช้ หากแนบฟอร์มหรือคำถาม ให้ใช้ตัวอย่างที่ไม่มีข้อมูลส่วนบุคคลและรหัสเชื่อมต่อ
+## Report an issue
 
-## แก้ไขซอร์ส
+Describe the steps, expected result and actual behavior. Include the browser or Node.js version when relevant. Use example forms and questions without personal data or integration keys.
 
-1. สร้าง branch สำหรับการเปลี่ยนแปลง
-2. ติดตั้งเครื่องมือจากโฟลเดอร์ `app` ด้วย `npm ci`
-3. แก้ซอร์สและเพิ่มการทดสอบเมื่อมีพฤติกรรมใหม่หรือแก้บั๊ก
-4. รัน `npm test` และ `npm run check:build`
-5. อธิบายปัญหา การเปลี่ยนแปลง และผลตรวจสอบใน pull request
+## Make a change
 
-การแก้โครงสร้างฐานข้อมูลต้องคำนึงถึงทั้งผู้ติดตั้งใหม่และระบบที่มีข้อมูลแล้ว ดู [คู่มือพัฒนา](app/docs/development.md)
+1. Create a branch for the change.
+2. Run `npm ci` from `app`.
+3. Change the source and add meaningful tests for new behavior or bug fixes.
+4. Run `npm test` and `npm run check:build`.
+5. Explain the problem, resulting behavior and validation in the pull request.
 
-## ไฟล์ที่ควรเก็บบนเครื่อง
+Database changes must support new installations and existing data. See the [development guide](app/docs/en/development.md).
 
-รหัสทีม local อยู่ใน `.dev.vars` และ state local อยู่ใน `.wrangler/` ส่วนไฟล์ตัวอย่างและ lockfile อยู่ใน repository เพื่อให้ผู้พัฒนาติดตั้งตามกันได้
+Check both English and Thai when changing the interface. Update both guide versions when behavior changes. See [Interface languages](app/docs/en/languages.md).
 
-โค้ดและเอกสารที่เพิ่มควรใช้ตัวอย่างทั่วไป และคงเงื่อนไขของ [MIT License](LICENSE)
+## Keep local files private
+
+The local key belongs in `.dev.vars`, and local runtime data belongs in `.wrangler/`. Example configuration and the lockfile are committed so developers can reproduce the environment.
+
+Use general examples in code and documentation, and retain the [MIT License](LICENSE).

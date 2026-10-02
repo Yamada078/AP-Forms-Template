@@ -138,3 +138,13 @@ test('organization migration preserves pre-existing forms and responses and leav
     assert.equal(db.prepare('SELECT access_mode FROM forms').get().access_mode,'PUBLIC');assert.equal(db.prepare('SELECT COUNT(*) AS n FROM responses').get().n,1);assert.equal(db.prepare('SELECT respondent_user_id FROM responses').get().respondent_user_id,null);assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
   }finally{db.close();}
 });
+
+
+test('new form defaults follow the requested interface language without changing the authored title',async()=>{
+ const f=await fixture();try{
+  for(const [language,section,next,name]of [['en','Section 1','Next','Name'],['th','ส่วนที่ 1','ถัดไป','ชื่อ']]){
+   const created=await f.call('/api/forms',{method:'POST',cookie:f.ownerCookie,body:{title:'ชื่อ',language}});assert.equal(created.status,201);const {id}=await created.json();
+   const loaded=await f.call('/api/forms/'+id,{cookie:f.ownerCookie});const {form}=await loaded.json();assert.equal(form.title,'ชื่อ');assert.equal(form.sections[0].title,section);assert.equal(form.sections[0].nextLabel,next);assert.equal(form.startPage.fields[0].label,name);
+  }
+ }finally{f.db.close();}
+});

@@ -1,25 +1,27 @@
-# รูปประกอบคำถาม
+**English** · [ภาษาไทย](README.th.md)
 
-Question Studio อ่านรายการรูปจาก `manifest.json` ในโฟลเดอร์นี้ รองรับ PNG, JPG, JPEG, WebP และ GIF
+# Question images
 
-## เพิ่มรูป
+Question Studio reads the image list from `manifest.json` in this directory. PNG, JPG, JPEG, WebP and GIF are supported.
 
-1. วางไฟล์รูปใน `public/assets/question-media/`
-2. รันจากโฟลเดอร์แอปที่มี `wrangler.jsonc`:
+## Add images
 
-   ```powershell
-   node scripts/generate-question-media-manifest.mjs
-   ```
+1. Add the files to `public/assets/question-media/`.
+2. From the application directory containing `wrangler.jsonc`, run:
 
-3. นำไฟล์รูป `manifest.json` และโฟลเดอร์ `versioned/` ไป deploy พร้อมเว็บ
-4. เปิด Question Studio เพื่อเลือกใช้รูป
+```sh
+node scripts/generate-question-media-manifest.mjs
+```
 
-สคริปต์สร้างสำเนาใน `versioned/` โดยใช้ชื่อที่มี hash ของเนื้อหาไฟล์ และอัปเดตรายการรูปให้โดยอัตโนมัติ
+3. Deploy the images, `manifest.json` and `versioned/` directory with the website.
+4. Open Question Studio to select an image.
 
-## รูปที่ใช้ในเวอร์ชันเผยแพร่
+The script creates copies in `versioned/` using content hashes in their filenames and updates the manifest automatically.
 
-ชุดคำถามที่เผยแพร่แล้วอ้างอิงรูปใน `versioned/` เพื่อคงรูปที่ใช้ในเวอร์ชันนั้น หากต้องการเปลี่ยนรูป ให้อัปเดตไฟล์ต้นฉบับแล้วรันสคริปต์อีกครั้ง เก็บสำเนาเก่าที่มีเวอร์ชันเผยแพร่อ้างอิงไว้ และไม่แก้เนื้อหาของไฟล์ hash เดิมโดยตรง
+## Images in published versions
 
-ไฟล์รูปเหล่านี้เข้าถึงได้จากเว็บ จึงควรใช้เฉพาะรูปที่ต้องการเผยแพร่
+Published question packs reference images in `versioned/` so those versions retain the original images. To update an image, replace its source file and run the script again. Keep older versioned copies still referenced by published packs, and do not edit an existing hashed file in place.
 
-[กลับคู่มือสื่อ](../README.md)
+These images are accessible from the website. Use only images intended to be published.
+
+[Form media](../README.md)

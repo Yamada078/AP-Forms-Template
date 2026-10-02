@@ -1,3 +1,7 @@
+
+function __apText(value) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.text(value) : value; }
+function __apHtml(strings, ...values) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.html(strings, ...values) : strings.reduce((result, part, index) => result + part + (index < values.length ? String(values[index] ?? '') : ''), ''); }
+function __apLabels(value) { return globalThis.APFormsI18n ? globalThis.APFormsI18n.labels(value) : value; }
 (function (root) {
   'use strict';
 
@@ -23,9 +27,9 @@
     return {
       preset: PRESETS.IOC,
       options: [
-        { id: 'ioc_minus_1', displayLabel: 'ไม่สอดคล้อง', value: -1 },
-        { id: 'ioc_zero', displayLabel: 'ไม่แน่ใจ', value: 0 },
-        { id: 'ioc_plus_1', displayLabel: 'สอดคล้อง', value: 1 },
+        { id: 'ioc_minus_1', displayLabel: __apText('ไม่สอดคล้อง'), value: -1 },
+        { id: 'ioc_zero', displayLabel: __apText('ไม่แน่ใจ'), value: 0 },
+        { id: 'ioc_plus_1', displayLabel: __apText('สอดคล้อง'), value: 1 },
       ],
       iocThreshold: parsedThreshold === null ? 0.5 : parsedThreshold,
     };

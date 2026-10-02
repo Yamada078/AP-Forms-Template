@@ -97,15 +97,17 @@ async function readBody(request, maxBytes = 1024 * 1024) {
   } catch { return null; }
 }
 
-function freshForm(title = 'แบบสอบถามใหม่') {
+function freshForm(title = 'แบบสอบถามใหม่', language = 'th') {
   const sectionId = id('sec');
+  const startPage = defaultStartPage(title, '');
+  if (language === 'en') { startPage.fields[0].label = 'Name'; startPage.fields[0].placeholder = 'Enter your name or nickname'; }
   return {
     version: 5,
     title,
     description: '',
-    startPage: defaultStartPage(title, ''),
+    startPage,
     theme: { accent: '#7c9cff', paperWidth: 900 },
-    sections: [{ id: sectionId, title: 'ส่วนที่ 1', description: '', nextLabel: 'ถัดไป', blocks: [], routingRules: [] }],
+    sections: [{ id: sectionId, title: language === 'en' ? 'Section 1' : 'ส่วนที่ 1', description: '', nextLabel: language === 'en' ? 'Next' : 'ถัดไป', blocks: [], routingRules: [] }],
   };
 }
 
@@ -877,7 +879,8 @@ export default {
       if (request.method === 'POST') {
         const body = await readBody(request) || {};
         const formId = id('form');
-        const form = freshForm(body.title || 'แบบสอบถามใหม่');
+        const language = body.language === 'en' ? 'en' : 'th';
+        const form = freshForm(body.title || (language === 'en' ? 'New questionnaire' : 'แบบสอบถามใหม่'), language);
         const now = new Date().toISOString();
         const organization = accountContext(request)?.organization;
         await env.DB.prepare(`INSERT INTO forms (id,title,data,published,created_at,updated_at${organization ? ',access_mode' : ''}) VALUES (?,?,?,?,?,?${organization ? ",'MEMBERS'" : ''})`)
