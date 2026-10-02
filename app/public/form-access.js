@@ -1,0 +1,14 @@
+const app=document.querySelector('#accessApp');
+const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const formId=new URLSearchParams(location.search).get('form');
+async function start(){
+  try{
+    const account=await APAccount.status();if(!account.user){APAccount.login('/');return;}
+    if(!formId)throw new Error('กรุณาเลือกฟอร์มจากหน้า Builder');
+    const response=await fetch('/api/forms/'+encodeURIComponent(formId)+'/access');const policy=await response.json();if(!response.ok)throw new Error(policy.error);
+    app.innerHTML=`<section class="card"><div class="header"><div><h1>ใครตอบฟอร์มนี้ได้บ้าง</h1><p>การเปลี่ยนสิทธิ์มีผลทันที รวมถึงลิงก์ที่เคยส่งให้ผู้ตอบแล้ว</p></div><a class="button" href="/">กลับ Builder</a></div><form id="policyForm"><label for="mode">การเข้าถึงฟอร์ม</label><select id="mode"><option value="PUBLIC">ทุกคนที่มีลิงก์ · ไม่ต้องเข้าสู่ระบบ</option><option value="MEMBERS">สมาชิกองค์กรที่เข้าสู่ระบบ</option><option value="SELECTED">เฉพาะสมาชิกที่เลือก</option></select><div id="members"><p class="small">เลือกจากสมาชิกที่เปิดใช้งานแล้ว</p>${policy.members.map(member=>`<label style="display:flex;align-items:center;gap:12px"><input style="width:auto" type="checkbox" value="${escape(member.id)}" ${policy.memberIds.includes(member.id)?'checked':''}>${escape(member.name)} <span class="small muted">${escape(member.username)}</span></label>`).join('')||'<p class="muted">เชิญสมาชิกและให้สมาชิกตั้งรหัสผ่านก่อน</p>'}</div><p class="small muted">ฟอร์มสำหรับสมาชิกใช้หน้าเว็บที่เข้าสู่ระบบ รุ่นนี้ยังไม่รองรับส่งคำตอบฟอร์มชนิดนี้ผ่านรหัส Application หรือบัญชีจากระบบภายนอก</p><button type="submit" class="primary full">บันทึกสิทธิ์ผู้ตอบ</button><div id="message" role="status"></div></form></section>`;
+    const mode=document.querySelector('#mode');mode.value=policy.mode;const update=()=>document.querySelector('#members').hidden=mode.value!=='SELECTED';mode.onchange=update;update();
+    document.querySelector('#policyForm').onsubmit=async event=>{event.preventDefault();const button=event.currentTarget.querySelector('button'),message=document.querySelector('#message');button.disabled=true;message.textContent='';try{const reply=await fetch('/api/forms/'+encodeURIComponent(formId)+'/access',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({mode:mode.value,memberIds:[...document.querySelectorAll('#members input:checked')].map(input=>input.value)})});const result=await reply.json();if(!reply.ok)throw new Error(result.error);message.className='success';message.textContent='บันทึกสิทธิ์ผู้ตอบแล้ว';}catch(error){message.className='error';message.textContent=error.message;}finally{button.disabled=false;}};
+  }catch(error){app.innerHTML=`<section class="card narrow"><h1>เปิดการตั้งค่าไม่ได้</h1><p class="error">${escape(error.message)}</p><a class="button" href="/">กลับ Builder</a></section>`;}
+}
+start();

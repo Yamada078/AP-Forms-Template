@@ -2,6 +2,7 @@
   "name": "applus-forms",
   "main": "./src/entry.js",
   "compatibility_date": "2026-08-18",
+  "compatibility_flags": ["nodejs_compat"],
   "keep_vars": true,
   "assets": {
     "directory": "./public/",

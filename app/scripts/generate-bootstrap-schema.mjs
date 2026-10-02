@@ -13,6 +13,7 @@ export const sources = [
   'migrations/0007_assessment_runtime_results.sql',
   'migrations/0008_question_activity_media.sql',
   'migrations/0009_question_pack_integration.sql',
+  'migrations/0010_organization_accounts.sql',
 ];
 
 export async function buildBootstrapSchema() {

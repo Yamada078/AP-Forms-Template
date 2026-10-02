@@ -32,6 +32,7 @@ class FakeD1 {
     }
   }
   first(sql, args) {
+    if (sql === 'SELECT * FROM organization WHERE id=1') return null;
     if (sql.includes('FROM forms WHERE public_id=?')) return structuredClone([...this.forms.values()].find(row => row.public_id === args[0]) || null);
     if (sql.includes('FROM revoked_public_links WHERE public_id=?')) return this.revoked.has(args[0]) ? { public_id: args[0] } : null;
     if (sql === 'SELECT public_id FROM forms WHERE id=?') return this.forms.has(args[0]) ? { public_id: this.forms.get(args[0]).public_id } : null;

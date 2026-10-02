@@ -119,9 +119,12 @@ async function publishedSnapshot(env, publicId, version) {
       WHERE f.public_id=? AND v.version=?`).bind(publicId, version).first();
 }
 
-async function requireFormAccess(env, applicationId, formId, bad) {
+async function requireFormAccess(env, applicationId, formId, bad, request) {
   const allowed = await env.DB.prepare('SELECT 1 AS allowed FROM application_forms WHERE application_id=? AND form_id=? LIMIT 1').bind(applicationId, formId).first();
-  return allowed ? null : bad('Application ไม่ได้รับอนุญาตให้ใช้ Form นี้', 403, { code: 'FORM_ACCESS_DENIED', formId });
+  if (!allowed) return bad('Application ไม่ได้รับอนุญาตให้ใช้ Form นี้', 403, { code: 'FORM_ACCESS_DENIED', formId });
+  const policy = request && await formAccessPolicy(request, env, formId);
+  if (policy && policy.mode !== 'PUBLIC') return bad('ฟอร์มสำหรับสมาชิกต้องตอบผ่านหน้าเว็บที่เข้าสู่ระบบ', 403, { code: 'SIGNED_IN_FORM_REQUIRED' });
+  return null;
 }
 
 async function publishedQuestionPack(env, packId, version) {
@@ -462,7 +465,7 @@ export async function handleIntegrationRequest(request, env, helpers) {
     if (requested.error) return bad(requested.error, 400, { code: 'INVALID_VERSION' });
     const snapshot = await publishedSnapshot(env, publicId, requested.value);
     if (!snapshot) return bad(requested.value == null ? 'ไม่พบ Published Form' : 'ไม่พบ Published Version ที่ร้องขอ', 404, { code: requested.value == null ? 'PUBLISHED_FORM_NOT_FOUND' : 'PUBLISHED_VERSION_NOT_FOUND' });
-    const accessDenied = await requireFormAccess(env, auth.principal.application_id, snapshot.form_id, bad);
+    const accessDenied = await requireFormAccess(env, auth.principal.application_id, snapshot.form_id, bad, request);
     if (accessDenied) return accessDenied;
     const publication = publicationView(snapshot);
     if (publication.state !== 'OPEN') return bad('Form ไม่เปิดรับคำตอบ', 403, { code: 'FORM_NOT_OPEN', state: publication.state });
@@ -496,7 +499,7 @@ export async function handleIntegrationRequest(request, env, helpers) {
     const requestedVersion = bodyVersion.value ?? queryVersion.value;
     const snapshot = await publishedSnapshot(env, publicId, requestedVersion);
     if (!snapshot) return bad(requestedVersion == null ? 'ไม่พบ Published Form' : 'ไม่พบ Published Version ที่ร้องขอ', 404, { code: requestedVersion == null ? 'PUBLISHED_FORM_NOT_FOUND' : 'PUBLISHED_VERSION_NOT_FOUND' });
-    const accessDenied = await requireFormAccess(env, auth.principal.application_id, snapshot.form_id, bad);
+    const accessDenied = await requireFormAccess(env, auth.principal.application_id, snapshot.form_id, bad, request);
     if (accessDenied) return accessDenied;
     const publication = publicationView(snapshot);
     if (publication.state !== 'OPEN') return bad('Form ไม่เปิดรับ Integration Response', 403, { code: 'FORM_NOT_OPEN', state: publication.state });
@@ -509,6 +512,7 @@ export async function handleIntegrationRequest(request, env, helpers) {
     if (respondent.error) return bad(respondent.error, 400, { code: 'INVALID_RESPONDENT' });
     const checked = validatePublicResponse(form, body.answers);
     if (checked.error) return bad(checked.error, 400, { code: 'INVALID_RESPONSE' });
+    delete respondent.meta._account;
     const now = new Date().toISOString(), responseId = id('resp'), version = Number(snapshot.published_version);
     const inserted = await env.DB.prepare(`INSERT INTO responses
       (id,form_id,respondent_name,respondent_meta,answers,path,score,published_version,created_at,
@@ -519,6 +523,7 @@ export async function handleIntegrationRequest(request, env, helpers) {
         WHERE f.id=? AND f.public_id=? AND f.published_data IS NOT NULL
           AND f.publication_state IN ('OPEN','SCHEDULED')
           AND (f.open_at IS NULL OR f.open_at<=?) AND (f.close_at IS NULL OR f.close_at>?)
+          ${accountContext(request)?.organization ? "AND f.access_mode='PUBLIC'" : ''}
       )`).bind(
         responseId, snapshot.form_id, respondent.respondentName, JSON.stringify(respondent.meta), JSON.stringify(checked.answers), JSON.stringify(checked.path), checked.score, version, now,
         'integration', auth.principal.application_id, source.version, source.session, source.platform, source.serialized,
@@ -644,3 +649,4 @@ export async function handleIntegrationRequest(request, env, helpers) {
 
   return bad('Integration API route not found', 404);
 }
+import { accountContext, formAccessPolicy } from './organization.js';

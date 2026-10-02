@@ -195,7 +195,7 @@ export default {
       const response = await baseWorker.fetch(request, env, ctx);
       if (!response.ok) return response;
       const data = await response.json();
-      return new Response(JSON.stringify({ ...data, appVersion: '5.2.1-question-pack-foundation' }), {
+      return new Response(JSON.stringify({ ...data, appVersion: '6.0.0-organization-preview' }), {
         status: response.status,
         headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
       });

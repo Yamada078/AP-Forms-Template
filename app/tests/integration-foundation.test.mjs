@@ -51,6 +51,7 @@ class IntegrationD1 {
   }
 
   execute(sql, args) {
+    if (sql === 'SELECT * FROM organization WHERE id=1') return { results: [] };
     if (sql.includes('FROM integration_credentials c JOIN applications a')) {
       const [capability, secretHash] = args;
       const credential = [...this.credentials.values()].find(row => row.secret_hash === secretHash);

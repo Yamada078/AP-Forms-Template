@@ -3,6 +3,7 @@ import { handleQuestionBankRequest } from './question-banks.js';
 import { handleQuestionBankPackageRequest } from './question-bank-packages.js';
 import { handleQuestionPackRequest } from './question-packs.js';
 import { handleAssessmentRequest } from './assessments.js';
+import { prepareAccountRequest, isStaff, accountContext, checkFormAccess, handleFormAccessSettings } from './organization.js';
 
 const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(data), {
   status,
@@ -10,7 +11,7 @@ const json = (data, status = 200, headers = {}) => new Response(JSON.stringify(d
 });
 const bad = (message, status = 400, extra = {}) => json({ error: message, ...extra }, status);
 const bearer = request => (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
-const isAdmin = (request, env) => !!env.TEAM_KEY && bearer(request) === env.TEAM_KEY;
+const isAdmin = isStaff;
 const id = (prefix = 'id') => `${prefix}_${crypto.randomUUID().replaceAll('-', '').slice(0, 18)}`;
 const enc = new TextEncoder();
 const PUBLICATION_STATES = new Set(['DRAFT', 'SCHEDULED', 'OPEN', 'CLOSED', 'ARCHIVED']);
@@ -664,7 +665,7 @@ export class FormRoom {
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
     this.ctx.acceptWebSocket(server);
-    server.serializeAttachment({ sessionId, name, formId, role, joinedAt: Date.now() });
+    server.serializeAttachment({ sessionId, name, formId, role, joinedAt: Date.now(), userId: request.headers.get('x-apforms-user-id') || '', tokenHash: request.headers.get('x-apforms-token-hash') || '', ticketExp: Number(request.headers.get('x-apforms-ticket-exp') || 0) });
 
     const storedDraft = await this.ctx.storage.get('latestDraft');
     const latestDraft = this.pendingDraft && (!storedDraft || this.pendingDraft.draftAt >= (storedDraft.draftAt || 0)) ? this.pendingDraft : storedDraft;
@@ -685,6 +686,15 @@ export class FormRoom {
     catch { return this.send(ws, { type: 'error', error: 'ข้อความ Live ไม่ถูกต้อง' }); }
     const a = ws.deserializeAttachment?.();
     if (!a) return;
+    if (a.userId) {
+      const active = a.ticketExp > Date.now() && await this.env.DB.prepare("SELECT 1 FROM organization_users u JOIN organization_sessions s ON s.user_id=u.id WHERE u.id=? AND u.status='ACTIVE' AND u.role IN ('ADMIN','EDITOR') AND s.token_hash=? AND s.expires_at>?").bind(a.userId, a.tokenHash, new Date().toISOString()).first();
+      if (!active) { ws.close(1008, 'account session expired'); return; }
+    } else {
+      let configured;
+      try { configured = await this.env.DB.prepare('SELECT id FROM organization WHERE id=1').first(); }
+      catch (error) { if (!/no such table.*organization/i.test(String(error))) throw error; }
+      if (configured) { ws.close(1008, 'account login required'); return; }
+    }
 
     if (m.type === 'ping') return this.send(ws, { type: 'pong', ts: Date.now() });
 
@@ -782,9 +792,13 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
+    if (p.startsWith('/api/')) {
+      const accountResponse = await prepareAccountRequest(request, env);
+      if (accountResponse) return accountResponse;
+    }
 
     if (p === '/api/health') {
-      return json({ ok: true, db: !!env.DB, teamKeyConfigured: !!env.TEAM_KEY, realtimeCollab: !!env.COLLAB, appVersion: '5.2.1-question-pack-foundation' });
+      return json({ ok: true, db: !!env.DB, teamKeyConfigured: !!env.TEAM_KEY, realtimeCollab: !!env.COLLAB, appVersion: '6.0.0-organization-preview' });
     }
 
     if (/^\/f\/[^/]+$/.test(p) && request.method === 'GET') {
@@ -804,7 +818,8 @@ export default {
       const sessionId = String(body.sessionId || '');
       const name = String(body.name || '').trim().slice(0, 60);
       if (!formId || !sessionId || !name) return bad('ข้อมูล Live Collaboration ไม่ครบ');
-      const ticket = await makeTicket(env, { formId, sessionId, name, exp: Date.now() + 10 * 60 * 1000 });
+      const account = accountContext(request);
+      const ticket = await makeTicket(env, { formId, sessionId, name: account?.user?.name || name, userId: account?.user?.id || null, tokenHash: account?.tokenHash || null, exp: Date.now() + 10 * 60 * 1000 });
       return json({ ticket });
     }
 
@@ -814,10 +829,17 @@ export default {
       const formId = decodeURIComponent(collab[1]);
       const ticket = await verifyTicket(env, url.searchParams.get('ticket'));
       if (!ticket || ticket.formId !== formId) return bad('Live Collaboration ticket ไม่ถูกต้องหรือหมดอายุ', 401);
+      if (accountContext(request)?.organization) {
+        const active = ticket.userId && ticket.tokenHash && await env.DB.prepare("SELECT 1 FROM organization_users u JOIN organization_sessions s ON s.user_id=u.id WHERE u.id=? AND u.status='ACTIVE' AND u.role IN ('ADMIN','EDITOR') AND s.token_hash=? AND s.expires_at>?").bind(ticket.userId, ticket.tokenHash, new Date().toISOString()).first();
+        if (!active) return bad('บัญชีหรือเซสชันนี้ไม่มีสิทธิ์แก้ไขฟอร์มแล้ว', 403);
+      }
       const headers = new Headers(request.headers);
       headers.set('x-goi-session-id', ticket.sessionId);
       headers.set('x-goi-member-name', ticket.name);
       headers.set('x-goi-form-id', formId);
+      headers.set('x-apforms-user-id', ticket.userId || '');
+      headers.set('x-apforms-token-hash', ticket.tokenHash || '');
+      headers.set('x-apforms-ticket-exp', String(ticket.exp));
       const stub = env.COLLAB.getByName(formId);
       return stub.fetch(new Request(request, { headers }));
     }
@@ -857,14 +879,17 @@ export default {
         const formId = id('form');
         const form = freshForm(body.title || 'แบบสอบถามใหม่');
         const now = new Date().toISOString();
-        await env.DB.prepare('INSERT INTO forms (id,title,data,published,created_at,updated_at) VALUES (?,?,?,?,?,?)')
+        const organization = accountContext(request)?.organization;
+        await env.DB.prepare(`INSERT INTO forms (id,title,data,published,created_at,updated_at${organization ? ',access_mode' : ''}) VALUES (?,?,?,?,?,?${organization ? ",'MEMBERS'" : ''})`)
           .bind(formId, form.title, JSON.stringify(form), 0, now, now).run();
         return json({ id: formId }, 201);
       }
       return bad('Method not allowed', 405);
     }
 
-    let m = p.match(/^\/api\/forms\/([^/]+)$/);
+    let m = p.match(/^\/api\/forms\/([^/]+)\/access$/);
+    if (m) return handleFormAccessSettings(request, env, decodeURIComponent(m[1]));
+    m = p.match(/^\/api\/forms\/([^/]+)$/);
     if (m) {
       if (!isAdmin(request, env)) return bad('Unauthorized', 401);
       const formId = decodeURIComponent(m[1]);
@@ -1055,7 +1080,7 @@ export default {
         env.DB.prepare('SELECT r.id,r.respondent_name,r.respondent_meta,r.answers,r.path,r.score,r.published_version,r.created_at,r.source,r.source_app_id,r.source_version,r.source_session,r.source_platform,r.source_metadata,a.name AS source_app_name FROM responses r LEFT JOIN applications a ON a.id=r.source_app_id WHERE r.form_id=? ORDER BY r.created_at DESC').bind(formId).all(),
         env.DB.prepare('SELECT version,data,published_at FROM form_versions WHERE form_id=? ORDER BY version DESC').bind(formId).all(),
       ]);
-      const responses = (q.results || []).map(r => ({ ...r, respondent_meta: JSON.parse(r.respondent_meta || '{}'), answers: JSON.parse(r.answers || '{}'), path: JSON.parse(r.path || '[]'), source_metadata: JSON.parse(r.source_metadata || '{}') }));
+        const responses = (q.results || []).map(r => ({ ...r, respondent_meta: JSON.parse(r.respondent_meta || '{}'), answers: JSON.parse(r.answers || '{}'), path: JSON.parse(r.path || '[]'), source_metadata: JSON.parse(r.source_metadata || '{}') }));
       const versions = (versionRows.results || []).map(v => ({ version: Number(v.version), form: JSON.parse(v.data), publishedAt: v.published_at }));
       const ascending = [...versions].sort((a, b) => a.version - b.version), compatibility = [];
       for (let i = 1; i < ascending.length; i++) compatibility.push({ fromVersion: ascending[i - 1].version, toVersion: ascending[i].version, ...classifySnapshots(ascending[i - 1].form, ascending[i].form) });
@@ -1072,6 +1097,8 @@ export default {
       }
       const publication = publicationView(row);
       if (publication.state !== 'OPEN') return json({ publication });
+      const accessError = await checkFormAccess(request, env, row.id);
+      if (accessError) return accessError;
       let form;
       try { form = JSON.parse(row.published_data); } catch { return bad('ข้อมูลฟอร์มไม่สมบูรณ์ กรุณาแจ้งผู้ดูแล', 500); }
       return json({ publication, form });
@@ -1089,6 +1116,8 @@ export default {
       }
       const publication = publicationView(row);
       if (publication.state !== 'OPEN') return bad(publication.state === 'SCHEDULED' ? 'แบบฟอร์มนี้ยังไม่เปิดรับคำตอบ' : publication.state === 'CLOSED' ? 'แบบฟอร์มนี้ปิดรับคำตอบแล้ว' : 'แบบฟอร์มนี้ไม่พร้อมใช้งาน', 403, { state: publication.state });
+      const accessError = await checkFormAccess(request, env, row.id);
+      if (accessError) return accessError;
       let form;
       try { form = normalizeRuntimeForm(JSON.parse(row.published_data)); } catch { return bad('ข้อมูลฟอร์มไม่สมบูรณ์ กรุณาแจ้งผู้ดูแล', 500); }
       if (!form) return bad('ข้อมูลฟอร์มไม่สมบูรณ์ กรุณาแจ้งผู้ดูแล', 500);
@@ -1096,10 +1125,15 @@ export default {
       if (respondent.error) return bad(respondent.error);
       const checked = validatePublicResponse(form, body.answers);
       if (checked.error) return bad(checked.error);
+      const account = accountContext(request);
+      delete respondent.meta._account;
+      if (account?.user) respondent.meta._account = { userId: account.user.id, username: account.user.username, name: account.user.name };
       const now = new Date().toISOString();
       const respId = id('resp');
-      const inserted = await env.DB.prepare("INSERT INTO responses (id,form_id,respondent_name,respondent_meta,answers,path,score,published_version,created_at) SELECT ?,?,?,?,?,?,?,?,? WHERE EXISTS (SELECT 1 FROM forms WHERE id=? AND public_id=? AND published_version=? AND published_data IS NOT NULL AND publication_state IN ('OPEN','SCHEDULED') AND (open_at IS NULL OR open_at<=?) AND (close_at IS NULL OR close_at>?))")
-        .bind(respId, row.id, respondent.respondentName, JSON.stringify(respondent.meta), JSON.stringify(checked.answers), JSON.stringify(checked.path), checked.score, Number(row.published_version), now, row.id, publicId, Number(row.published_version), now, now).run();
+      const secured = !!account?.organization;
+      const accessGuard = secured ? " AND (access_mode='PUBLIC' OR (? IS NOT NULL AND (access_mode='MEMBERS' OR EXISTS (SELECT 1 FROM form_members m WHERE m.form_id=forms.id AND m.user_id=?))))" : '';
+      const inserted = await env.DB.prepare(`INSERT INTO responses (id,form_id,respondent_name,respondent_meta,answers,path,score,published_version,created_at${secured ? ',respondent_user_id' : ''}) SELECT ?,?,?,?,?,?,?,?,?${secured ? ',?' : ''} WHERE EXISTS (SELECT 1 FROM forms WHERE id=? AND public_id=? AND published_version=? AND published_data IS NOT NULL AND publication_state IN ('OPEN','SCHEDULED') AND (open_at IS NULL OR open_at<=?) AND (close_at IS NULL OR close_at>?)${accessGuard})`)
+        .bind(respId, row.id, respondent.respondentName, JSON.stringify(respondent.meta), JSON.stringify(checked.answers), JSON.stringify(checked.path), checked.score, Number(row.published_version), now, ...(secured ? [account.user?.id || null] : []), row.id, publicId, Number(row.published_version), now, now, ...(secured ? [account.user?.id || null, account.user?.id || null] : [])).run();
       if (!inserted.meta?.changes) return bad('สถานะหรือ Version ของแบบฟอร์มเปลี่ยนไป กรุณาเปิดลิงก์ใหม่ก่อนส่งคำตอบ', 409);
       return json({ ok: true, id: respId, publishedVersion: Number(row.published_version) }, 201);
     }

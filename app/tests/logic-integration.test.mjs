@@ -63,7 +63,7 @@ test('Worker installs Builder bridge before public/login early returns', async (
   assert.match(entry, /logic-inspector-stability\.js\?v=4\.3\.6/);
   assert.match(entry, /logic-structure-model\.js\?v=4\.4\.0/);
   assert.match(entry, /logic-structural-drag\.js\?v=4\.4\.0/);
-  assert.match(entry, /5\.2\.1-question-pack-foundation/);
+  assert.match(entry, /6\.0\.0-organization-preview/);
   assert.match(entry, /export class FormRoom extends BaseFormRoom/);
   assert.doesNotMatch(entry, /DROP\s+TABLE|DELETE\s+FROM/i);
 });

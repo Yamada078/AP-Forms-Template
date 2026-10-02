@@ -140,7 +140,7 @@ function localizeStudio() {
   if (studioDescription) studioDescription.textContent = `สตูดิโอคำถาม · ทั้งหมด ${Number(state.bank?.question_count || state.total).toLocaleString()} ข้อ`;
 }
 
-function renderLogin() {
+function renderLogin(){if(window.APAccount){APAccount.login();return}
   app.innerHTML = `<main class="qb-login"><section class="qb-login-card"><div class="qb-logo">QS</div><h1>สตูดิโอคำถาม</h1><p class="muted">เข้าสู่พื้นที่จัดการคลังคำถามของทีม AP+forms</p><div class="qb-field"><label>ชื่อสมาชิกทีม</label><input id="qbMember" class="qb-input" value="${esc(state.memberName)}" autocomplete="nickname" placeholder="เช่น ผู้ดูแลเนื้อหา"></div><div class="qb-field" style="margin-top:10px"><label>TEAM KEY</label><input id="qbKey" class="qb-input" type="password" autocomplete="current-password"></div><button id="qbLogin" class="qb-btn primary" style="width:100%;margin-top:12px">เข้าสู่สตูดิโอคำถาม</button><div id="qbLoginError" class="qb-error"></div><button class="qb-btn ghost" data-nav="forms" style="width:100%;margin-top:6px">กลับ AP+forms</button></section></main>`;
   bindNav();
   const login = async () => {
