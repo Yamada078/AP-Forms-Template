@@ -19,7 +19,7 @@ export const sources = [
 export async function buildBootstrapSchema() {
   const parts = await Promise.all(sources.map(async source => {
     const sql = await readFile(new URL(`../${source}`, import.meta.url), 'utf8');
-    return `-- ${source}\n${sql.trim()}\n`;
+    return `-- ${source}\n${sql.replace(/\r\n/g, '\n').trim()}\n`;
   }));
   return '-- AP+forms: initialize an empty database once.\n-- For existing databases, use the required additive migrations instead.\n\n' + parts.join('\n');
 }
