@@ -1,0 +1,42 @@
+{
+  "name": "applus-forms",
+  "main": "./src/entry.js",
+  "compatibility_date": "2026-08-18",
+  "keep_vars": true,
+  "assets": {
+    "directory": "./public/",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/",
+      "/index.html",
+      "/logic",
+      "/api/*",
+      "/f/*",
+      "/question-banks.html",
+      "/question-banks.js",
+      "/question-banks.css",
+      "/question-bank-templates/*"
+    ]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "COLLAB",
+        "class_name": "FormRoom"
+      }
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "applus-forms-db",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "exports": {
+    "FormRoom": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  }
+}

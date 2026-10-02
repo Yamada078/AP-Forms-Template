@@ -1,0 +1,111 @@
+{
+  "kind": "goi.question-bank.package",
+  "schemaVersion": 1,
+  "bank": {
+    "name": "ตัวอย่างคลังคำถาม 7 รูปแบบ",
+    "description": "แม่แบบขนาดเล็กสำหรับเริ่มใช้งาน Question Studio"
+  },
+  "tags": [
+    { "key": "starter", "name": "ตัวอย่าง", "group": "แหล่งที่มา" },
+    { "key": "basic", "name": "พื้นฐาน", "group": "ระดับ" }
+  ],
+  "questions": [
+    {
+      "id": "single_choice_example",
+      "type": "SINGLE_CHOICE",
+      "prompt": "ข้อใดเป็นจำนวนคู่",
+      "difficulty": 1,
+      "answerConfig": {
+        "choices": [
+          { "id": "single_a", "text": "3" },
+          { "id": "single_b", "text": "4" }
+        ],
+        "correctIds": ["single_b"]
+      },
+      "tags": ["starter", "basic"],
+      "explanation": "4 หารด้วย 2 ลงตัว"
+    },
+    {
+      "id": "multiple_choice_example",
+      "type": "MULTIPLE_CHOICE",
+      "prompt": "ข้อใดเป็นสีหลักของแสง",
+      "difficulty": 2,
+      "answerConfig": {
+        "choices": [
+          { "id": "multi_r", "text": "แดง" },
+          { "id": "multi_g", "text": "เขียว" },
+          { "id": "multi_b", "text": "น้ำเงิน" },
+          { "id": "multi_y", "text": "เหลือง" }
+        ],
+        "correctIds": ["multi_r", "multi_g", "multi_b"]
+      },
+      "tags": ["starter"]
+    },
+    {
+      "id": "true_false_example",
+      "type": "TRUE_FALSE",
+      "prompt": "น้ำแข็งเป็นน้ำในสถานะของแข็ง",
+      "difficulty": 1,
+      "answerConfig": { "correctAnswer": true },
+      "tags": ["starter", "basic"]
+    },
+    {
+      "id": "short_answer_example",
+      "type": "SHORT_ANSWER",
+      "prompt": "เมืองหลวงของประเทศไทยคือเมืองใด",
+      "difficulty": 1,
+      "answerConfig": {
+        "acceptedAnswers": ["กรุงเทพ", "กรุงเทพฯ", "กรุงเทพมหานคร"],
+        "caseSensitive": false,
+        "trimWhitespace": true,
+        "normalizeUnicode": true
+      },
+      "tags": ["starter", "basic"]
+    },
+    {
+      "id": "ordering_example",
+      "type": "ORDERING",
+      "prompt": "เรียงจำนวนจากน้อยไปมาก",
+      "difficulty": 2,
+      "answerConfig": {
+        "items": [
+          { "id": "order_1", "text": "1" },
+          { "id": "order_2", "text": "2" },
+          { "id": "order_3", "text": "3" }
+        ],
+        "correctOrder": ["order_1", "order_2", "order_3"]
+      },
+      "tags": ["starter"]
+    },
+    {
+      "id": "matching_example",
+      "type": "MATCHING",
+      "prompt": "จับคู่ประเทศกับเมืองหลวง",
+      "difficulty": 2,
+      "answerConfig": {
+        "pairs": [
+          { "id": "pair_1", "leftId": "country_th", "rightId": "capital_bkk", "leftText": "ไทย", "rightText": "กรุงเทพมหานคร" },
+          { "id": "pair_2", "leftId": "country_jp", "rightId": "capital_tokyo", "leftText": "ญี่ปุ่น", "rightText": "โตเกียว" }
+        ]
+      },
+      "tags": ["starter"]
+    },
+    {
+      "id": "drag_drop_example",
+      "type": "DRAG_DROP",
+      "prompt": "ลากสัตว์ไปยังกลุ่มที่ถูกต้อง",
+      "difficulty": 2,
+      "answerConfig": {
+        "targets": [
+          { "id": "mammal", "label": "สัตว์เลี้ยงลูกด้วยนม" },
+          { "id": "bird", "label": "นก" }
+        ],
+        "tokens": [
+          { "id": "dog", "text": "สุนัข", "targetId": "mammal" },
+          { "id": "sparrow", "text": "นกกระจอก", "targetId": "bird" }
+        ]
+      },
+      "tags": ["starter"]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+# Local development only. Generate your own file with npm run key:local.
+TEAM_KEY=replace-with-your-local-team-key

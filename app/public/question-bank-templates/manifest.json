@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "templates": [
+    {
+      "name": "ตัวอย่างคำถามครบ 7 รูปแบบ",
+      "description": "คลังเริ่มต้นขนาดเล็กสำหรับทดลองแก้ไข แท็ก และสร้างชุดคำถาม",
+      "path": "/question-bank-templates/starter-7-types.json"
+    }
+  ]
+}
